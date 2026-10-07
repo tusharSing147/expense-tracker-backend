@@ -2,10 +2,18 @@ import app from './app';
 import { env } from './config/env';
 import { logger } from './config/logger';
 import { prisma } from './config/prisma';
+import { cleanupExpiredTokens } from './utils/tokenCleanup';
 
 const server = app.listen(env.PORT, () => {
   logger.info({ port: env.PORT, nodeEnv: env.NODE_ENV }, 'server listening');
 });
+
+const cleanupTimer = setInterval(() => {
+  cleanupExpiredTokens().catch((err: unknown) => {
+    logger.error({ err }, 'scheduled token cleanup failed');
+  });
+}, 24 * 60 * 60 * 1000);
+cleanupTimer.unref();
 
 let shuttingDown = false;
 
@@ -13,6 +21,7 @@ const shutdown = (signal: string): void => {
   if (shuttingDown) return;
   shuttingDown = true;
   logger.info({ signal }, 'shutdown signal received');
+  clearInterval(cleanupTimer);
 
   const force = setTimeout(() => {
     logger.error('forced shutdown after 10s');
