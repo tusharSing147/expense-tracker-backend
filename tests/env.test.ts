@@ -151,5 +151,23 @@ describe('parseEnv', () => {
     raw.COOKIE_SECURE = 'true';
     expect(parseEnv(raw).COOKIE_SECURE).toBe(true);
   });
+
+  it('defaults DOCS_ENABLED to true when absent', () => {
+    const raw = validRaw();
+    delete raw.DOCS_ENABLED;
+    expect(parseEnv(raw).DOCS_ENABLED).toBe(true);
+  });
+
+  it("coerces DOCS_ENABLED='false' to a boolean", () => {
+    const raw = validRaw();
+    raw.DOCS_ENABLED = 'false';
+    expect(parseEnv(raw).DOCS_ENABLED).toBe(false);
+  });
+
+  it("rejects DOCS_ENABLED='yes'", () => {
+    const raw = validRaw();
+    raw.DOCS_ENABLED = 'yes';
+    expect(errorMessage(raw)).toContain('DOCS_ENABLED');
+  });
 });
 

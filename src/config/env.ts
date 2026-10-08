@@ -12,6 +12,7 @@ export interface Env {
   CLIENT_URL: string[];
   COOKIE_SECURE: boolean;
   COOKIE_SAMESITE: 'lax' | 'strict' | 'none';
+  DOCS_ENABLED: boolean;
   BCRYPT_COST: number;
   LOG_LEVEL: 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace' | 'silent';
 }
@@ -57,6 +58,7 @@ const envSchema = z
     CLIENT_URL: clientUrls,
     COOKIE_SECURE: z.enum(['true', 'false']).default('false').transform((value) => value === 'true'),
     COOKIE_SAMESITE: z.enum(SAME_SITE).default('lax'),
+    DOCS_ENABLED: z.enum(['true', 'false']).default('true').transform((value) => value === 'true'),
     BCRYPT_COST: z.coerce.number().int().min(10).max(14).default(12),
     LOG_LEVEL: z.enum(LOG_LEVELS).default('info'),
   })

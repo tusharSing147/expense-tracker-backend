@@ -11,6 +11,7 @@ import { prisma } from './config/prisma';
 import { globalLimiter } from './middleware/rateLimit';
 import { notFoundHandler, errorHandler } from './middleware/errorHandler';
 import apiRouter from './routes/index';
+import docsRouter from './docs';
 
 const app = express();
 
@@ -68,6 +69,10 @@ app.get('/health/ready', async (req, res) => {
 });
 
 app.use('/api', apiRouter);
+
+if (env.DOCS_ENABLED) {
+  app.use('/api/docs', docsRouter);
+}
 
 app.use(notFoundHandler);
 app.use(errorHandler);
